@@ -2,27 +2,11 @@
 
 Entrega de la tarea de CRUD: **pizzas, tamaños, bebidas y clientes**.
 
-Partí de la plantilla que dejó el profesor
-([javaSpring_pizza](https://github.com/vmartinez1984/javaSpring_pizza)) y le
-respeté el paquete (`mx.unam.aragon.tsp.vmartinez.pizzas`), el `build.gradle`
-y la versión de Spring Boot, para que se pueda revisar igual que la plantilla.
-
-![Panel de administración](docs/panel.png)
 
 ---
 
 ## 1. Cómo arrancarlo
 
-Necesita Java 21 (el proyecto está configurado con esa versión en `build.gradle`).
-
-**Desde IntelliJ:** abrir la carpeta del proyecto, esperar a que Gradle sincronice
-y correr la clase `PizzasApplication`.
-
-**Desde terminal:**
-
-```bash
-./gradlew bootRun
-```
 
 Queda en `http://localhost:8080`:
 
