@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pizzería · Panel de administración</title>
+<style>
+  :root {
+    --fondo: #f6f7f9;
+    --panel: #ffffff;
+    --borde: #e3e6ea;
+    --texto: #1f2937;
+    --suave: #6b7280;
+    --acento: #c0392b;
+    --acento-suave: #fdecea;
+    --verde: #15803d;
+    --verde-suave: #e7f6ec;
+    --gris-suave: #f1f3f5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    font-size: 14px;
+  }
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--borde);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  header .logo {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--acento-suave);
+    display: grid; place-items: center;
+    font-size: 20px;
+  }
+  header h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  header p { margin: 2px 0 0; color: var(--suave); font-size: 12.5px; }
+  header .api {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--suave);
+    background: var(--gris-suave);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  nav {
+    display: flex;
+    gap: 4px;
+    padding: 14px 28px 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--borde);
+  }
+  nav button {
+    border: 0;
+    background: transparent;
+    padding: 10px 16px 12px;
+    font-size: 13.5px;
+    font-weight: 550;
+    color: var(--suave);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+  }
+  nav button:hover { color: var(--texto); }
+  nav button.activo { color: var(--acento); border-bottom-color: var(--acento); }
+  main { padding: 22px 28px 60px; max-width: 1180px; margin: 0 auto; }
+  .barra {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .barra h2 { font-size: 15px; margin: 0; font-weight: 650; }
+  .barra .conteo {
+    font-size: 12px;
+    color: var(--suave);
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .barra input {
+    margin-left: auto;
+    padding: 8px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 210px;
+    background: var(--panel);
+    color: var(--texto);
+  }
+  .barra input:focus { outline: 2px solid #f3c6c0; border-color: var(--acento); }
+  .btn {
+    border: 1px solid var(--borde);
+    background: var(--panel);
+    color: var(--texto);
+    padding: 8px 13px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 550;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--gris-suave); }
+  .btn-primario {
+    background: var(--acento);
+    border-color: var(--acento);
+    color: #fff;
+  }
+  .btn-primario:hover { background: #a93226; }
+  .btn-mini { padding: 5px 9px; font-size: 12px; }
+  .btn-peligro { color: var(--acento); }
+  .btn-peligro:hover { background: var(--acento-suave); }
+  .tabla-envoltura {
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--suave);
+    font-weight: 600;
+    padding: 11px 14px;
+    background: #fafbfc;
+    border-bottom: 1px solid var(--borde);
+    white-space: nowrap;
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #eef0f2;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: #fcfcfd; }
+  .celda-id { color: var(--suave); font-variant-numeric: tabular-nums; width: 54px; }
+  .celda-acciones { text-align: right; white-space: nowrap; }
+  .celda-acciones .btn + .btn { margin-left: 6px; }
+  .insignia {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .insignia-si { background: var(--verde-suave); color: var(--verde); }
+  .insignia-no { background: #f1f3f5; color: var(--suave); }
+  .etiqueta-tipo {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #4b5563;
+    background: var(--gris-suave);
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: .02em;
+  }
+  .vacio {
+    padding: 46px 20px;
+    text-align: center;
+    color: var(--suave);
+  }
+  .vacio strong { display: block; color: var(--texto); margin-bottom: 4px; font-size: 14px; }
+  dialog {
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    padding: 0;
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 18px 50px rgba(15, 23, 42, .18);
+    color: var(--texto);
+  }
+  dialog::backdrop { background: rgba(15, 23, 42, .35); }
+  dialog form { padding: 20px 22px 18px; }
+  dialog h3 { margin: 0 0 16px; font-size: 15.5px; }
+  .campo { margin-bottom: 13px; }
+  .campo label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #374151;
+  }
+  .campo input[type=text], .campo input[type=number], .campo select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #fff;
+    color: var(--texto);
+  }
+  .campo input:focus, .campo select:focus {
+    outline: 2px solid #f3c6c0;
+    border-color: var(--acento);
+  }
+  .campo-check { display: flex; align-items: center; gap: 8px; }
+  .campo-check input { width: 15px; height: 15px; accent-color: var(--acento); }
+  .campo-check label { margin: 0; font-weight: 500; }
+  .acciones-form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .error-form {
+    background: var(--acento-suave);
+    color: #96281b;
+    border-radius: 8px;
+    padding: 9px 11px;
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    white-space: pre-line;
+  }
+  #toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 50;
+  }
+  .toast {
+    background: #1f2937;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .2);
+    animation: entra .18s ease-out;
+  }
+  .toast.error { background: #96281b; }
+  @keyframes entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🍕</div>
+  <div>
+    <h1>Pizzería · Panel de administración</h1>
+    <p>CRUD de pizzas, tamaños, bebidas y clientes</p>
+  </div>
+  <span class="api">/api/v1</span>
+</header>
+
+<nav id="pestanas"></nav>
+
+<main>
+  <div class="barra">
+    <h2 id="titulo-seccion">Pizzas</h2>
+    <span class="conteo" id="conteo">0 registros</span>
+    <input id="buscar" type="text" placeholder="Buscar por nombre…">
+    <button class="btn btn-primario" id="btn-nuevo">+ Nuevo</button>
+  </div>
+  <div class="tabla-envoltura">
+    <div id="tabla"></div>
+  </div>
+</main>
+
+<dialog id="dialogo">
+  <form id="formulario" method="dialog">
+    <h3 id="titulo-form">Nueva pizza</h3>
+    <div id="error-form" class="error-form" hidden></div>
+    <div id="campos"></div>
+    <div class="acciones-form">
+      <button type="button" class="btn" id="btn-cancelar">Cancelar</button>
+      <button type="submit" class="btn btn-primario" id="btn-guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+const API = "/api/v1";
+const TIPOS_BEBIDA = ["REFRESCO", "AGUA", "JUGO", "CERVEZA", "CAFE", "OTRA"];
+
+const entidades = {
+  pizzas: {
+    titulo: "Pizzas",
+    singular: "pizza",
+    ruta: "/pizzas",
+    columnas: [
+      { campo: "id", etiqueta: "ID", clase: "celda-id" },
+      { campo: "nombre", etiqueta: "Nombre" },
+      { campo: "descripcion", etiqueta: "Descripción" },
+      { campo: "precio", etiqueta: "Precio", tipo: "moneda" },
+      { campo: "tamano.nombre", etiqueta: "Tamaño" },
+      { campo: "disponible", etiqueta: "Disponible", tipo: "bool" }
+    ],
+    campos: [
+      { campo: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+      { campo: "descripcion", etiqueta: "Descripción", tipo: "text" },
+      { campo: "precio", etiqueta: "Precio (MXN)", tipo: "number", paso: "0.01", requerido: true },
+      { campo: "tamanoId", etiqueta: "Tamaño", tipo: "select-tamanos" },
+      { campo: "disponible", etiqueta: "Disponible", tipo: "checkbox", defecto: true }
+    ]
+  },
+  tamanos: {
+    titulo: "Tamaños",
+    singular: "tamaño",
+    ruta: "/tamanos",
+    columnas: [
+      { campo: "id", etiqueta: "ID", clase: "celda-id" },
+      { campo: "nombre", etiqueta: "Nombre" },
+      { campo: "diametroCm", etiqueta: "Diámetro", sufijo: " cm" },
+      { campo: "precio", etiqueta: "Precio", tipo: "moneda" }
+    ],
+    campos: [
+      { campo: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+      { campo: "diametroCm", etiqueta: "Diámetro (cm)", tipo: "number", paso: "1", requerido: true },
+      { campo: "precio", etiqueta: "Precio (MXN)", tipo: "number", paso: "0.01", requerido: true }
+    ]
+  },
+  bebidas: {
+    titulo: "Bebidas",
+    singular: "bebida",
+    ruta: "/bebidas",
+    columnas: [
+      { campo: "id", etiqueta: "ID", clase: "celda-id" },
+      { campo: "nombre", etiqueta: "Nombre" },
+      { campo: "tipo", etiqueta: "Tipo", tipo: "tipo" },
+      { campo: "precio", etiqueta: "Precio", tipo: "moneda" },
+      { campo: "volumenMl", etiqueta: "Volumen", sufijo: " ml" },
+      { campo: "disponible", etiqueta: "Disponible", tipo: "bool" }
+    ],
+    campos: [
+      { campo: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+      { campo: "tipo", etiqueta: "Tipo", tipo: "select", opciones: TIPOS_BEBIDA, requerido: true },
+      { campo: "precio", etiqueta: "Precio (MXN)", tipo: "number", paso: "0.01", requerido: true },
+      { campo: "volumenMl", etiqueta: "Volumen (ml)", tipo: "number", paso: "1", requerido: true },
+      { campo: "disponible", etiqueta: "Disponible", tipo: "checkbox", defecto: true }
+    ]
+  },
+  clientes: {
+    titulo: "Clientes",
+    singular: "cliente",
+    ruta: "/clientes",
+    columnas: [
+      { campo: "id", etiqueta: "ID", clase: "celda-id" },
+      { campo: "nombre", etiqueta: "Nombre" },
+      { campo: "apellidos", etiqueta: "Apellidos" },
+      { campo: "email", etiqueta: "Correo" },
+      { campo: "telefono", etiqueta: "Teléfono" },
+      { campo: "direccion", etiqueta: "Dirección" }
+    ],
+    campos: [
+      { campo: "nombre", etiqueta: "Nombre", tipo: "text", requerido: true },
+      { campo: "apellidos", etiqueta: "Apellidos", tipo: "text", requerido: true },
+      { campo: "email", etiqueta: "Correo", tipo: "text", requerido: true },
+      { campo: "telefono", etiqueta: "Teléfono", tipo: "text" },
+      { campo: "direccion", etiqueta: "Dirección", tipo: "text" }
+    ]
+  }
+};
+
+let actual = "pizzas";
+let registros = [];
+let enEdicion = null;
+let tamanosCache = [];
+
+const $ = (sel) => document.querySelector(sel);
+
+function valorDe(objeto, ruta) {
+  return ruta.split(".").reduce((acc, parte) => (acc == null ? acc : acc[parte]), objeto);
+}
+
+function dinero(n) {
+  return "$" + Number(n).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function aviso(mensaje, esError) {
+  const div = document.createElement("div");
+  div.className = "toast" + (esError ? " error" : "");
+  div.textContent = mensaje;
+  $("#toast").appendChild(div);
+  setTimeout(() => div.remove(), 3200);
+}
+
+async function pedir(ruta, opciones) {
+  const respuesta = await fetch(API + ruta, opciones);
+  if (respuesta.status === 204) return null;
+  const texto = await respuesta.text();
+  const datos = texto ? JSON.parse(texto) : null;
+  if (!respuesta.ok) {
+    const detalle = datos && datos.detail ? datos.detail : "Error " + respuesta.status;
+    const campos = datos && datos.errores ? Object.values(datos.errores) : [];
+    throw new Error([detalle].concat(campos).join("\n"));
+  }
+  return datos;
+}
+
+function pintarPestanas() {
+  const nav = $("#pestanas");
+  nav.innerHTML = "";
+  Object.keys(entidades).forEach((clave) => {
+    const boton = document.createElement("button");
+    boton.textContent = entidades[clave].titulo;
+    if (clave === actual) boton.className = "activo";
+    boton.addEventListener("click", () => {
+      actual = clave;
+      pintarPestanas();
+      cargar();
+    });
+    nav.appendChild(boton);
+  });
+}
+
+async function cargar() {
+  const config = entidades[actual];
+  $("#titulo-seccion").textContent = config.titulo;
+  $("#buscar").value = "";
+  try {
+    registros = await pedir(config.ruta);
+    pintarTabla();
+  } catch (error) {
+    aviso(error.message, true);
+  }
+}
+
+function pintarTabla() {
+  const config = entidades[actual];
+  const filtro = $("#buscar").value.trim().toLowerCase();
+  const visibles = registros.filter((registro) =>
+    !filtro || String(valorDe(registro, "nombre") || "").toLowerCase().includes(filtro)
+  );
+
+  $("#conteo").textContent = visibles.length + (visibles.length === 1 ? " registro" : " registros");
+
+  if (visibles.length === 0) {
+    $("#tabla").innerHTML =
+      '<div class="vacio"><strong>Sin registros</strong>' +
+      "No hay " + config.titulo.toLowerCase() + " que coincidan con la búsqueda.</div>";
+    return;
+  }
+
+  const encabezados = config.columnas
+    .map((col) => "<th>" + col.etiqueta + "</th>")
+    .join("") + "<th></th>";
+
+  const filas = visibles.map((registro) => {
+    const celdas = config.columnas.map((col) => {
+      const valor = valorDe(registro, col.campo);
+      let contenido = valor == null ? "—" : String(valor);
+      if (col.tipo === "moneda") contenido = dinero(valor);
+      else if (col.tipo === "bool") {
+        contenido = valor
+          ? '<span class="insignia insignia-si">Sí</span>'
+          : '<span class="insignia insignia-no">No</span>';
+      } else if (col.tipo === "tipo") {
+        contenido = '<span class="etiqueta-tipo">' + valor + "</span>";
+      } else if (col.sufijo && valor != null) {
+        contenido = valor + col.sufijo;
+      }
+      return '<td class="' + (col.clase || "") + '">' + contenido + "</td>";
+    }).join("");
+
+    return "<tr>" + celdas +
+      '<td class="celda-acciones">' +
+      '<button class="btn btn-mini" data-editar="' + registro.id + '">Editar</button>' +
+      '<button class="btn btn-mini btn-peligro" data-eliminar="' + registro.id + '">Eliminar</button>' +
+      "</td></tr>";
+  }).join("");
+
+  $("#tabla").innerHTML =
+    "<table><thead><tr>" + encabezados + "</tr></thead><tbody>" + filas + "</tbody></table>";
+
+  $("#tabla").querySelectorAll("[data-editar]").forEach((boton) => {
+    boton.addEventListener("click", () => abrirFormulario(Number(boton.dataset.editar)));
+  });
+  $("#tabla").querySelectorAll("[data-eliminar]").forEach((boton) => {
+    boton.addEventListener("click", () => eliminar(Number(boton.dataset.eliminar)));
+  });
+}
+
+async function abrirFormulario(id) {
+  const config = entidades[actual];
+  enEdicion = id || null;
+  $("#error-form").hidden = true;
+  $("#titulo-form").textContent = (enEdicion ? "Editar " : "Nuevo ") + config.singular;
+
+  if (config.campos.some((campo) => campo.tipo === "select-tamanos")) {
+    try {
+      tamanosCache = await pedir("/tamanos");
+    } catch (error) {
+      tamanosCache = [];
+    }
+  }
+
+  const registro = enEdicion ? registros.find((r) => r.id === enEdicion) : null;
+  const contenedor = $("#campos");
+  contenedor.innerHTML = "";
+
+  config.campos.forEach((campo) => {
+    const valor = registro ? valorDe(registro, campo.campo) : (campo.defecto !== undefined ? campo.defecto : "");
+
+    if (campo.tipo === "checkbox") {
+      const div = document.createElement("div");
+      div.className = "campo campo-check";
+      div.innerHTML =
+        '<input type="checkbox" id="campo-' + campo.campo + '"' + (valor ? " checked" : "") + ">" +
+        '<label for="campo-' + campo.campo + '">' + campo.etiqueta + "</label>";
+      contenedor.appendChild(div);
+      return;
+    }
+
+    const div = document.createElement("div");
+    div.className = "campo";
+    const etiqueta = document.createElement("label");
+    etiqueta.setAttribute("for", "campo-" + campo.campo);
+    etiqueta.textContent = campo.etiqueta;
+    div.appendChild(etiqueta);
+
+    if (campo.tipo === "select" || campo.tipo === "select-tamanos") {
+      const select = document.createElement("select");
+      select.id = "campo-" + campo.campo;
+      const opciones = campo.tipo === "select"
+        ? campo.opciones.map((o) => ({ valor: o, texto: o }))
+        : tamanosCache.map((t) => ({ valor: t.id, texto: t.nombre + " (" + t.diametroCm + " cm)" }));
+
+      if (!campo.requerido) {
+        const vacia = document.createElement("option");
+        vacia.value = "";
+        vacia.textContent = "Sin asignar";
+        select.appendChild(vacia);
+      }
+      opciones.forEach((opcion) => {
+        const el = document.createElement("option");
+        el.value = opcion.valor;
+        el.textContent = opcion.texto;
+        if (String(opcion.valor) === String(valor)) el.selected = true;
+        select.appendChild(el);
+      });
+      div.appendChild(select);
+    } else {
+      const input = document.createElement("input");
+      input.type = campo.tipo === "number" ? "number" : "text";
+      if (campo.paso) input.step = campo.paso;
+      input.id = "campo-" + campo.campo;
+      input.value = valor == null ? "" : valor;
+      if (campo.requerido) input.required = true;
+      div.appendChild(input);
+    }
+    contenedor.appendChild(div);
+  });
+
+  $("#dialogo").showModal();
+  const primero = $("#campos").querySelector("input, select");
+  if (primero) primero.focus();
+}
+
+async function guardar(evento) {
+  evento.preventDefault();
+  const config = entidades[actual];
+  const cuerpo = {};
+
+  config.campos.forEach((campo) => {
+    const elemento = document.getElementById("campo-" + campo.campo);
+    if (!elemento) return;
+    if (campo.tipo === "checkbox") {
+      cuerpo[campo.campo] = elemento.checked;
+    } else if (campo.tipo === "number") {
+      cuerpo[campo.campo] = elemento.value === "" ? null : Number(elemento.value);
+    } else if (campo.campo === "tamanoId") {
+      cuerpo[campo.campo] = elemento.value === "" ? null : Number(elemento.value);
+    } else {
+      cuerpo[campo.campo] = elemento.value === "" ? null : elemento.value;
+    }
+  });
+
+  const metodo = enEdicion ? "PUT" : "POST";
+  const ruta = config.ruta + (enEdicion ? "/" + enEdicion : "");
+
+  try {
+    await pedir(ruta, {
+      method: metodo,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cuerpo)
+    });
+    $("#dialogo").close();
+    aviso(enEdicion ? "Registro actualizado" : "Registro creado");
+    cargar();
+  } catch (error) {
+    const caja = $("#error-form");
+    caja.textContent = error.message;
+    caja.hidden = false;
+  }
+}
+
+async function eliminar(id) {
+  const config = entidades[actual];
+  const registro = registros.find((r) => r.id === id);
+  const nombre = registro ? (valorDe(registro, "nombre") || "el registro") : "el registro";
+  if (!confirm("¿Eliminar " + nombre + "?")) return;
+
+  try {
+    await pedir(config.ruta + "/" + id, { method: "DELETE" });
+    aviso("Registro eliminado");
+    cargar();
+  } catch (error) {
+    aviso(error.message, true);
+  }
+}
+
+$("#btn-nuevo").addEventListener("click", () => abrirFormulario(null));
+$("#btn-cancelar").addEventListener("click", () => $("#dialogo").close());
+$("#formulario").addEventListener("submit", guardar);
+$("#buscar").addEventListener("input", pintarTabla);
+
+pintarPestanas();
+cargar();
+</script>
+</body>
+</html>

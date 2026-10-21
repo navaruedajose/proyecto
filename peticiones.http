@@ -1,0 +1,170 @@
+### Variables
+@base = http://localhost:8080/api/v1
+
+### ========== PIZZAS ==========
+
+### Listar pizzas
+GET {{base}}/pizzas
+
+### Listar solo disponibles
+GET {{base}}/pizzas?disponible=true
+
+### Buscar pizza por id
+GET {{base}}/pizzas/1
+
+### Crear pizza
+POST {{base}}/pizzas
+Content-Type: application/json
+
+{
+  "nombre": "Pizza BBQ",
+  "descripcion": "Pollo, tocino y salsa BBQ",
+  "precio": 215.00,
+  "tamanoId": 3,
+  "disponible": true
+}
+
+### Actualizar pizza
+PUT {{base}}/pizzas/1
+Content-Type: application/json
+
+{
+  "nombre": "Pepperoni especial",
+  "descripcion": "Con doble pepperoni",
+  "precio": 209.00,
+  "tamanoId": 2,
+  "disponible": false
+}
+
+### Eliminar pizza
+DELETE {{base}}/pizzas/1
+
+### ========== TAMAÑOS ==========
+
+### Listar tamaños
+GET {{base}}/tamanos
+
+### Buscar tamaño por id
+GET {{base}}/tamanos/1
+
+### Crear tamaño
+POST {{base}}/tamanos
+Content-Type: application/json
+
+{
+  "nombre": "Jumbo",
+  "diametroCm": 45,
+  "precio": 329.00
+}
+
+### Actualizar tamaño
+PUT {{base}}/tamanos/1
+Content-Type: application/json
+
+{
+  "nombre": "Chica",
+  "diametroCm": 26,
+  "precio": 135.00
+}
+
+### Eliminar tamaño
+DELETE {{base}}/tamanos/1
+
+### ========== BEBIDAS ==========
+
+### Listar bebidas
+GET {{base}}/bebidas
+
+### Filtrar por tipo
+GET {{base}}/bebidas?tipo=JUGO
+
+### Buscar bebida por id
+GET {{base}}/bebidas/1
+
+### Crear bebida
+POST {{base}}/bebidas
+Content-Type: application/json
+
+{
+  "nombre": "Limonada",
+  "tipo": "JUGO",
+  "precio": 42.00,
+  "volumenMl": 500,
+  "disponible": true
+}
+
+### Actualizar bebida
+PUT {{base}}/bebidas/1
+Content-Type: application/json
+
+{
+  "nombre": "Coca-Cola",
+  "tipo": "REFRESCO",
+  "precio": 38.00,
+  "volumenMl": 600,
+  "disponible": false
+}
+
+### Eliminar bebida
+DELETE {{base}}/bebidas/1
+
+### ========== CLIENTES ==========
+
+### Listar clientes
+GET {{base}}/clientes
+
+### Buscar cliente por id
+GET {{base}}/clientes/1
+
+### Crear cliente
+POST {{base}}/clientes
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "apellidos": "Ramírez Soto",
+  "email": "pedro.ramirez@example.com",
+  "telefono": "5512345678",
+  "direccion": "Calle 5 de Mayo 45"
+}
+
+### Actualizar cliente
+PUT {{base}}/clientes/1
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellidos": "García López",
+  "email": "ana.garcia@example.com",
+  "telefono": "5500000000",
+  "direccion": "Nueva dirección 456"
+}
+
+### Eliminar cliente
+DELETE {{base}}/clientes/1
+
+### ========== CASOS DE ERROR ==========
+
+### 400 - validación
+POST {{base}}/pizzas
+Content-Type: application/json
+
+{
+  "nombre": "",
+  "precio": -5
+}
+
+### 404 - no existe
+GET {{base}}/pizzas/9999
+
+### 409 - nombre repetido
+POST {{base}}/pizzas
+Content-Type: application/json
+
+{
+  "nombre": "Pepperoni",
+  "precio": 150.00
+}
+
+### 409 - tamaño en uso
+DELETE {{base}}/tamanos/2
