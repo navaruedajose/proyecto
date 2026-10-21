@@ -5,6 +5,8 @@ construida sobre la plantilla del profesor
 ([javaSpring_pizza](https://github.com/vmartinez1984/javaSpring_pizza)):
 mismo paquete base, mismo `build.gradle` y misma versión de Spring Boot.
 
+![Panel de administración](docs/panel.png)
+
 ## Tecnologías
 
 | Componente | Versión |
